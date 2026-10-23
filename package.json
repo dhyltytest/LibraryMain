@@ -1,0 +1,20 @@
+{
+  "name": "library",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^43.4.0"
+  },
+  "devDependencies": {
+    "electron-packager": "^17.1.2"
+  }
+}

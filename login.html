@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login - BookShare</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            background: #f4f7fb;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 30px 20px;
+        }
+
+
+        /* MAIN LOGIN BOX */
+
+        .login-container {
+
+            width: 100%;
+            max-width: 500px;
+
+            background: white;
+
+            padding: 45px 50px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 8px 30px
+                rgba(0, 0, 0, 0.10);
+        }
+
+
+        /* HEADER */
+
+        .header {
+            text-align: center;
+
+            margin-bottom: 35px;
+        }
+
+
+        .header h1 {
+            margin: 0;
+
+            color: #2563eb;
+
+            font-size: 38px;
+        }
+
+
+        .header p {
+            margin: 10px 0 0;
+
+            color: #555;
+
+            font-size: 16px;
+
+            line-height: 1.5;
+        }
+
+
+        /* FORM */
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+
+        label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            color: #222;
+        }
+
+
+        input {
+            width: 100%;
+
+            padding: 14px 15px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 7px;
+
+            font-size: 16px;
+
+            outline: none;
+        }
+
+
+        input:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(37, 99, 235, 0.10);
+        }
+
+
+        /* LOGIN BUTTON */
+
+        .login-button {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .login-button:hover {
+            background: #1d4ed8;
+        }
+
+
+        /* REGISTER LINK */
+
+        .register-link {
+
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #555;
+
+            font-size: 15px;
+        }
+
+
+        .register-link a {
+
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =========================================
+           TABLET
+           ========================================= */
+
+        @media (max-width: 768px) {
+
+            body {
+                padding: 25px 18px;
+            }
+
+
+            .login-container {
+
+                max-width: 460px;
+
+                padding: 40px 35px;
+            }
+
+
+            .header h1 {
+                font-size: 34px;
+            }
+
+        }
+
+
+        /* =========================================
+           PHONE
+           ========================================= */
+
+        @media (max-width: 480px) {
+
+            body {
+
+                padding: 15px;
+
+                align-items: center;
+            }
+
+
+            .login-container {
+
+                width: 100%;
+
+                padding: 30px 22px;
+
+                border-radius: 10px;
+            }
+
+
+            .header {
+
+                margin-bottom: 28px;
+            }
+
+
+            .header h1 {
+
+                font-size: 30px;
+            }
+
+
+            .header p {
+
+                font-size: 14px;
+            }
+
+
+            label {
+
+                font-size: 15px;
+            }
+
+
+            input {
+
+                padding: 13px;
+
+                font-size: 15px;
+            }
+
+
+            .login-button {
+
+                padding: 13px;
+
+                font-size: 16px;
+            }
+
+
+            .register-link {
+
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            BookShare
+        </h1>
+
+        <p>
+            Book Donation & Redistribution Platform
+        </p>
+
+    </div>
+
+
+    <!-- LOGIN FORM -->
+
+    <form
+        action="login.php"
+        method="POST"
+    >
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+        </div>
+
+
+        <!-- LOGIN -->
+
+        <button
+            type="submit"
+            class="login-button"
+        >
+            Login
+        </button>
+
+
+    </form>
+
+
+    <!-- REGISTER -->
+
+    <div class="register-link">
+
+        Don't have an account?
+
+        <a href="register.html">
+            Register here
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

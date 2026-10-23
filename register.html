@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Register - BookShare</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            background: #f4f7fb;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 30px 20px;
+        }
+
+
+        /* MAIN REGISTER BOX */
+
+        .register-container {
+
+            width: 100%;
+
+            max-width: 550px;
+
+            background: white;
+
+            padding: 45px 50px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 8px 30px
+                rgba(0, 0, 0, 0.10);
+        }
+
+
+        /* HEADER */
+
+        .header {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+
+        .header h1 {
+
+            margin: 0;
+
+            color: #2563eb;
+
+            font-size: 38px;
+        }
+
+
+        .header p {
+
+            margin: 10px 0 0;
+
+            color: #555;
+
+            font-size: 16px;
+
+            line-height: 1.5;
+        }
+
+
+        /* FORM */
+
+        .form-group {
+
+            margin-bottom: 18px;
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            color: #222;
+        }
+
+
+        input,
+        select {
+
+            width: 100%;
+
+            padding: 14px 15px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 7px;
+
+            font-size: 16px;
+
+            outline: none;
+
+            background: white;
+        }
+
+
+        input:focus,
+        select:focus {
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(37, 99, 235, 0.10);
+        }
+
+
+        /* REGISTER BUTTON */
+
+        .register-button {
+
+            width: 100%;
+
+            padding: 14px;
+
+            margin-top: 5px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .register-button:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* LOGIN LINK */
+
+        .login-link {
+
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #555;
+
+            font-size: 15px;
+        }
+
+
+        .login-link a {
+
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+
+        .login-link a:hover {
+
+            text-decoration: underline;
+        }
+
+
+        /* =========================================
+           TABLET
+           ========================================= */
+
+        @media (max-width: 768px) {
+
+            body {
+
+                padding: 25px 18px;
+
+                align-items: center;
+            }
+
+
+            .register-container {
+
+                max-width: 500px;
+
+                padding: 40px 35px;
+            }
+
+
+            .header h1 {
+
+                font-size: 34px;
+            }
+
+        }
+
+
+        /* =========================================
+           PHONE
+           ========================================= */
+
+        @media (max-width: 480px) {
+
+            body {
+
+                padding: 15px;
+            }
+
+
+            .register-container {
+
+                width: 100%;
+
+                padding: 30px 22px;
+
+                border-radius: 10px;
+            }
+
+
+            .header {
+
+                margin-bottom: 25px;
+            }
+
+
+            .header h1 {
+
+                font-size: 30px;
+            }
+
+
+            .header p {
+
+                font-size: 14px;
+            }
+
+
+            .form-group {
+
+                margin-bottom: 16px;
+            }
+
+
+            label {
+
+                font-size: 15px;
+            }
+
+
+            input,
+            select {
+
+                padding: 13px;
+
+                font-size: 15px;
+            }
+
+
+            .register-button {
+
+                padding: 13px;
+
+                font-size: 16px;
+            }
+
+
+            .login-link {
+
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="register-container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            BookShare
+        </h1>
+
+        <p>
+            Book Donation & Redistribution Platform
+        </p>
+
+    </div>
+
+
+    <!-- REGISTRATION FORM -->
+
+    <form
+        action="register.php"
+        method="POST"
+    >
+
+
+        <!-- FULL NAME -->
+
+        <div class="form-group">
+
+            <label for="full_name">
+                Full Name
+            </label>
+
+            <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                placeholder="Enter your full name"
+                required
+            >
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+            <label for="email">
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+        </div>
+
+
+        <!-- PHONE -->
+
+        <div class="form-group">
+
+            <label for="phone">
+                Phone Number
+            </label>
+
+            <input
+                type="text"
+                id="phone"
+                name="phone"
+                placeholder="Enter your phone number"
+            >
+
+        </div>
+
+
+        <!-- ORGANIZATION -->
+
+        <div class="form-group">
+
+            <label for="organization">
+                School / Organization
+            </label>
+
+            <input
+                type="text"
+                id="organization"
+                name="organization"
+                placeholder="Enter your school or organization"
+            >
+
+        </div>
+
+
+        <!-- USER TYPE -->
+
+        <div class="form-group">
+
+            <label for="role">
+                User Type
+            </label>
+
+            <select
+                id="role"
+                name="role"
+                required
+            >
+
+                <option
+                    value=""
+                    selected
+                    disabled
+                >
+                    Select User Type
+                </option>
+
+                <option value="admin">
+                    Admin User
+                </option>
+
+                <option value="client">
+                    Client User
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- REGISTER -->
+
+        <button
+            type="submit"
+            class="register-button"
+        >
+
+            Create Account
+
+        </button>
+
+
+    </form>
+
+
+    <!-- LOGIN -->
+
+    <div class="login-link">
+
+        Already have an account?
+
+        <a href="login.html">
+            Login here
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
