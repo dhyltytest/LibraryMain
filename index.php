@@ -12,6 +12,11 @@ require_once 'functions.php';
 
 require_login();
 
+if (session_user_type() === 'client') {
+    header("Location: client_dashboard.php");
+    exit();
+}
+
 
 /* ==========================================
    GET USER INFORMATION
@@ -975,7 +980,7 @@ if ($userType === 'admin') {
 
     <div class="logo">
 
-        BookShare
+        BookBridge
 
         <span>
             Book Donation & Redistribution
@@ -1032,18 +1037,14 @@ if ($userType === 'admin') {
         </a>
 
 
-        <a href="donations.php">
+        <a href="/Library/donations.php">
+    <span class="icon">
+        ♧
+    </span>
+    Donations
+</a>
 
-            <span class="icon">
-                ♧
-            </span>
-
-            Donations
-
-        </a>
-
-
-        <a href="requests.php">
+       <a href="book_requests.php">
 
             <span class="icon">
                 □
@@ -1158,7 +1159,7 @@ if ($userType === 'admin') {
 
         <div class="breadcrumb">
 
-            BookShare /
+            BookBridge /
 
             <strong>
                 Dashboard

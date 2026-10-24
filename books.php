@@ -129,7 +129,7 @@ $books = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 <body>
     <header class="page-header">
-        <a class="back-button" href="index.php">Back to Dashboard</a>
+        <a class="back-button" href="client_dashboard.php">Back to Dashboard</a>
         <h1>BookBridge - Available Books</h1>
     </header>
 

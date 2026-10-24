@@ -64,15 +64,30 @@ if (!$result['success']) {
 if ($user_type === 'client') {
     try {
         $conn = connect_db();
+
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $borrower_role = 'recipient';
+
         $stmt = $conn->prepare(
             "INSERT INTO borrowers
-            (full_name, email, phone, organization)
-            VALUES (?, ?, ?, ?)"
+            (full_name, email, password, role, phone, organization)
+            VALUES (?, ?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("ssss", $full_name, $email, $phone, $organization);
+
+        $stmt->bind_param(
+            "ssssss",
+            $full_name,
+            $email,
+            $password_hash,
+            $borrower_role,
+            $phone,
+            $organization
+        );
+
         $stmt->execute();
         $stmt->close();
-    } catch (Exception $e) {
+
+    } catch (Throwable $e) {
         die("Client registration failed: " . $e->getMessage());
     }
 }

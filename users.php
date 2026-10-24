@@ -1,3 +1,4 @@
+```php
 <?php
 
 session_start();
@@ -21,33 +22,42 @@ if (session_user_type() !== 'admin') {
     exit();
 }
 
+$conn->set_charset("utf8mb4");
+
+/* Admin accounts only */
 $admins = $conn->query("
     SELECT id, full_name, email, phone, organization, user_type
     FROM users
+    WHERE LOWER(TRIM(user_type)) IN ('admin', 'admin user')
     ORDER BY id DESC
 ");
 
+if (!$admins) {
+    die("Admin query failed: " . $conn->error);
+}
+
+/* Client accounts only */
 $clients = $conn->query("
     SELECT id, full_name, email, phone, organization
     FROM borrowers
     ORDER BY id DESC
 ");
 
+if (!$clients) {
+    die("Client query failed: " . $conn->error);
+}
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Users - BookShare</title>
+<title>Users - BookBridge</title>
 
 <style>
-
 * {
     box-sizing: border-box;
     font-family: Arial, sans-serif;
@@ -81,6 +91,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
     margin-bottom: 20px;
 }
 
@@ -92,8 +104,18 @@ body {
     border-radius: 5px;
 }
 
+.section {
+    margin-top: 30px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
 table {
     width: 100%;
+    min-width: 650px;
     border-collapse: collapse;
     margin-bottom: 35px;
 }
@@ -110,7 +132,7 @@ td {
     border-bottom: 1px solid #ddd;
 }
 
-tr:hover {
+tr:hover td {
     background: #f5f5f5;
 }
 
@@ -118,111 +140,110 @@ tr:hover {
     font-weight: bold;
 }
 
-</style>
+.empty {
+    padding: 15px;
+    background: #f4f7fb;
+    border-radius: 5px;
+    margin-bottom: 25px;
+}
 
+@media (max-width: 600px) {
+    .header {
+        padding: 20px;
+    }
+
+    .container {
+        padding: 15px;
+        margin: 15px auto;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <div class="header">
-
-    <h1>BookShare</h1>
-
+    <h1>BookBridge</h1>
     <p>User Management</p>
-
 </div>
 
 <div class="container">
 
-<div class="top-bar">
+    <div class="top-bar">
+        <h2>Users</h2>
+        <a href="index.php" class="back-button">Back to Dashboard</a>
+    </div>
 
-    <h2>Users</h2>
+    <div class="section">
+        <h3>Admin Users</h3>
 
-    <a href="index.php" class="back-button">
-        Back to Dashboard
-    </a>
+        <?php if ($admins->num_rows > 0) { ?>
+        <div class="table-wrapper">
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>User Type</th>
+                </tr>
 
-</div>
+                <?php while ($row = $admins->fetch_assoc()) { ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['id'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['full_name'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['email'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['phone'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['organization'] ?? '') ?></td>
+                    <td class="role">Admin User</td>
+                </tr>
+                <?php } ?>
+            </table>
+        </div>
+        <?php } else { ?>
+            <p class="empty">No admin accounts found.</p>
+        <?php } ?>
+    </div>
 
-<h3>Admin Users</h3>
+    <div class="section">
+        <h3>Client Users</h3>
 
-<table>
+        <?php if ($clients->num_rows > 0) { ?>
+        <div class="table-wrapper">
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>User Type</th>
+                </tr>
 
-<tr>
-    <th>ID</th>
-    <th>Full Name</th>
-    <th>Email</th>
-    <th>Phone</th>
-    <th>Organization</th>
-    <th>User Type</th>
-</tr>
-
-<?php while ($row = $admins->fetch_assoc()) { ?>
-
-<tr>
-
-<td><?php echo htmlspecialchars($row['id']); ?></td>
-
-<td><?php echo htmlspecialchars($row['full_name']); ?></td>
-
-<td><?php echo htmlspecialchars($row['email']); ?></td>
-
-<td><?php echo htmlspecialchars($row['phone']); ?></td>
-
-<td><?php echo htmlspecialchars($row['organization']); ?></td>
-
-<td class="role">Admin User</td>
-
-</tr>
-
-<?php } ?>
-
-</table>
-
-
-<h3>Client Users</h3>
-
-<table>
-
-<tr>
-    <th>ID</th>
-    <th>Full Name</th>
-    <th>Email</th>
-    <th>Phone</th>
-    <th>Organization</th>
-    <th>User Type</th>
-</tr>
-
-<?php while ($row = $clients->fetch_assoc()) { ?>
-
-<tr>
-
-<td><?php echo htmlspecialchars($row['id']); ?></td>
-
-<td><?php echo htmlspecialchars($row['full_name']); ?></td>
-
-<td><?php echo htmlspecialchars($row['email']); ?></td>
-
-<td><?php echo htmlspecialchars($row['phone']); ?></td>
-
-<td><?php echo htmlspecialchars($row['organization']); ?></td>
-
-<td class="role">Client User</td>
-
-</tr>
-
-<?php } ?>
-
-</table>
+                <?php while ($row = $clients->fetch_assoc()) { ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['id'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['full_name'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['email'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['phone'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($row['organization'] ?? '') ?></td>
+                    <td class="role">Client User</td>
+                </tr>
+                <?php } ?>
+            </table>
+        </div>
+        <?php } else { ?>
+            <p class="empty">No client accounts found.</p>
+        <?php } ?>
+    </div>
 
 </div>
 
 </body>
-
 </html>
 
 <?php
-
 $conn->close();
-
 ?>
+```

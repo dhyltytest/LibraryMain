@@ -11,13 +11,22 @@ require_once 'functions.php';
 
 require_login();
 
+if (session_user_type() !== 'admin') {
+    header('Location: index.php');
+    exit();
+}
+
+if (empty($_SESSION['master_list_csrf'])) {
+    $_SESSION['master_list_csrf'] = bin2hex(random_bytes(32));
+}
+
 /* ==========================================
    SEARCH
    ========================================== */
 
 $search = '';
 
-if (isset($_GET['search'])) {
+if (isset($_GET['search']) && is_string($_GET['search'])) {
     $search = trim($_GET['search']);
 }
 
@@ -477,13 +486,15 @@ try {
 
             color: white;
 
+            border: 0;
+
             padding: 7px 12px;
 
             border-radius: 5px;
 
-            text-decoration: none;
-
             font-size: 13px;
+
+            cursor: pointer;
 
         }
 
@@ -622,6 +633,20 @@ try {
             </a>
 
         </div>
+
+        <?php if (isset($_GET['success']) && is_string($_GET['success'])) { ?>
+
+            <div class="search-result" role="status">
+                <?php echo htmlspecialchars($_GET['success'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+
+        <?php } elseif (isset($_GET['error']) && is_string($_GET['error'])) { ?>
+
+            <div class="search-result" role="alert">
+                <?php echo htmlspecialchars($_GET['error'], ENT_QUOTES, 'UTF-8'); ?>
+            </div>
+
+        <?php } ?>
 
 
         <!-- ==========================================
@@ -859,7 +884,7 @@ try {
                     <td>
 
                         <a
-                            href="edit_user.php?id=<?php echo $row['id']; ?>"
+                            href="edit_user.php?id=<?php echo (int) $row['id']; ?>"
                             class="edit-btn"
                         >
 
@@ -868,14 +893,20 @@ try {
                         </a>
 
 
-                        <a
-                            href="delete_user.php?id=<?php echo $row['id']; ?>"
-                            class="delete-btn"
+                        <form
+                            action="delete_user.php"
+                            method="POST"
+                            style="display: inline;"
+                            onsubmit="return confirm('Delete this user? This action cannot be undone.');"
                         >
-
-                            Delete
-
-                        </a>
+                            <input type="hidden" name="id" value="<?php echo (int) $row['id']; ?>">
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="<?php echo htmlspecialchars($_SESSION['master_list_csrf'], ENT_QUOTES, 'UTF-8'); ?>"
+                            >
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
 
                     </td>
 

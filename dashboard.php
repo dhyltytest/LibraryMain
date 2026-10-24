@@ -36,7 +36,7 @@ $initial = strtoupper(substr($clientName, 0, 1));
     >
 
     <title>
-        Client Dashboard - BookShare
+        Client Dashboard - BookBridge
     </title>
 
 
@@ -648,7 +648,7 @@ $initial = strtoupper(substr($clientName, 0, 1));
 
     <div class="logo">
 
-        ● BookShare
+        ● BookBridge
 
         <span>
             SDG 4 · Quality Education
@@ -695,7 +695,7 @@ $initial = strtoupper(substr($clientName, 0, 1));
         </a>
 
 
-        <a href="request_book.php">
+        <a href="book_requests.php">
 
             <span class="icon">□</span>
 
@@ -726,7 +726,7 @@ $initial = strtoupper(substr($clientName, 0, 1));
         </a>
 
 
-        <a href="my_requests.php">
+        <a href="book_requests.php">
 
             <span class="icon">□</span>
 
@@ -735,13 +735,7 @@ $initial = strtoupper(substr($clientName, 0, 1));
         </a>
 
 
-        <a href="distribution_history.php">
-
-            <span class="icon">↔</span>
-
-            Distribution History
-
-        </a>
+       <a class="nav-link" href="distributions.php">↔ Distributions</a>
 
 
     </nav>
@@ -989,7 +983,7 @@ $initial = strtoupper(substr($clientName, 0, 1));
                     </a>
 
 
-                    <a href="request_book.php">
+                    <a href="book_requests.php">
 
                         Request a Book
 
