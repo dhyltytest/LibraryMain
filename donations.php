@@ -3,6 +3,7 @@
 session_start();
 require_once __DIR__ . '/db.php';
 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 $conn = connect_db();
 
 if (empty($_SESSION['user_id']) && empty($_SESSION['email'])) {
@@ -38,7 +39,6 @@ $categories = [
     'Other'
 ];
 
-/* FIND THE CLIENT'S BORROWER ID */
 $borrowerId = 0;
 
 if (!$isAdmin && $email !== '') {
@@ -62,30 +62,57 @@ if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $bookId = (int)($_POST['book_id'] ?? 0);
     $newStatus = (string)($_POST['donation_status'] ?? '');
 
-    if ($bookId <= 0 ||
-        !in_array($newStatus, ['Approved', 'Rejected'], true)) {
+    if (
+        $bookId <= 0 ||
+        !in_array($newStatus, ['Approved', 'Rejected'], true)
+    ) {
         $error = 'Invalid donation or status.';
     } else {
-        $stmt = $conn->prepare(
-            "UPDATE books
-             SET donation_status = ?,
-                 available = CASE
-                     WHEN ? = 'Approved' THEN 1
-                     ELSE 0
-                 END
-             WHERE id = ? AND donation_status = 'Pending'"
-        );
+        try {
+            $conn->begin_transaction();
 
-        $stmt->bind_param('ssi', $newStatus, $newStatus, $bookId);
+            $available = ($newStatus === 'Approved') ? 1 : 0;
 
-        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            $stmt = $conn->prepare(
+                "UPDATE books
+                 SET donation_status = ?, available = ?
+                 WHERE id = ? AND donation_status = 'Pending'"
+            );
+            $stmt->bind_param('sii', $newStatus, $available, $bookId);
+            $stmt->execute();
+            $updatedBook = $stmt->affected_rows;
+            $stmt->close();
+
+            if ($updatedBook !== 1) {
+                throw new Exception(
+                    'The book could not be updated. It may no longer be pending.'
+                );
+            }
+
+            $stmt = $conn->prepare(
+                "UPDATE donations
+                 SET status = ?
+                 WHERE book_id = ? AND status = 'Pending'"
+            );
+            $stmt->bind_param('si', $newStatus, $bookId);
+            $stmt->execute();
+            $updatedDonation = $stmt->affected_rows;
+            $stmt->close();
+
+            if ($updatedDonation !== 1) {
+                throw new Exception(
+                    'The matching donation record was not found. The changes were cancelled.'
+                );
+            }
+
+            $conn->commit();
+
             $message = 'Donation #' . $bookId . ' has been ' .
                 strtolower($newStatus) . '.';
-        } else {
-            $error = 'The donation could not be updated. It may no longer be pending.';
+        } catch (Throwable $e) {
+            $conn->rollback();
+            $error = $e->getMessage();
         }
-
-        $stmt->close();
     }
 }
 
@@ -102,78 +129,99 @@ if (!$isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (
         $title === '' ||
         $author === '' ||
-        $category === '' ||
         !in_array($category, $categories, true) ||
         $quantity < 1 ||
         $quantity > 10000
     ) {
         $error = 'Please enter a valid title, author, category, and quantity.';
     } else {
-        $donationStatus = 'Pending';
-        $available = 0;
+        try {
+            $conn->begin_transaction();
 
-        $stmt = $conn->prepare(
-            "INSERT INTO books
-             (title, author, category, donor_id, description,
-              quantity, donation_status, available)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        );
+            $donationStatus = 'Pending';
+            $available = 0;
 
-        $stmt->bind_param(
-            'sssisisi',
-            $title,
-            $author,
-            $category,
-            $borrowerId,
-            $description,
-            $quantity,
-            $donationStatus,
-            $available
-        );
+            $stmt = $conn->prepare(
+                "INSERT INTO books
+                 (title, author, category, donor_id, description,
+                  quantity, donation_status, available)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            );
 
-        if ($stmt->execute()) {
-            $message = 'Thank you! Your donation was submitted and is waiting for admin approval.';
+            $stmt->bind_param(
+                'sssisisi',
+                $title,
+                $author,
+                $category,
+                $borrowerId,
+                $description,
+                $quantity,
+                $donationStatus,
+                $available
+            );
+
+            $stmt->execute();
+            $bookId = (int)$conn->insert_id;
+            $stmt->close();
+
+            $stmt = $conn->prepare(
+                "INSERT INTO donations
+                 (donor_id, book_id, quantity, description, status)
+                 VALUES (?, ?, ?, ?, ?)"
+            );
+
+            $stmt->bind_param(
+                'iiiss',
+                $borrowerId,
+                $bookId,
+                $quantity,
+                $description,
+                $donationStatus
+            );
+
+            $stmt->execute();
+            $stmt->close();
+
+            $conn->commit();
+
+            $message = 'Thank you! Your donation was saved and is waiting for admin approval.';
 
             $title = '';
             $author = '';
             $category = '';
             $description = '';
             $quantity = 1;
-        } else {
-            $error = 'Unable to save your donation. Please check your books table.';
+        } catch (Throwable $e) {
+            $conn->rollback();
+            $error = 'Unable to save the donation: ' . $e->getMessage();
         }
-
-        $stmt->close();
     }
 }
 
-/* ADMIN: LOAD DONATION LIST */
+/* ADMIN: LOAD DONATIONS FROM BOTH TABLES */
 $donations = false;
 
 if ($isAdmin) {
     $donations = $conn->query(
         "SELECT
             b.id,
+            d.id AS donation_id,
             b.title,
             b.author,
             b.category,
-            b.quantity,
-            b.description,
+            d.quantity,
+            d.description,
             b.donation_status,
-            b.created_at,
+            d.donated_at AS created_at,
             borrower.full_name AS donor_name,
             borrower.email AS donor_email
-         FROM books b
-         LEFT JOIN borrowers borrower ON borrower.id = b.donor_id
-         WHERE b.donor_id IS NOT NULL
+         FROM donations d
+         INNER JOIN books b ON b.id = d.book_id
+         LEFT JOIN borrowers borrower ON borrower.id = d.donor_id
          ORDER BY
             CASE WHEN b.donation_status = 'Pending' THEN 0 ELSE 1 END,
-            b.id DESC"
+            d.id DESC"
     );
-
-    if (!$donations) {
-        die('Unable to load donations. Please check your books table columns.');
-    }
 }
 
 /* CLIENT: LOAD APPROVED BOOKS */

@@ -1,4 +1,4 @@
-
+```php
 <?php
 session_start();
 
@@ -7,10 +7,12 @@ require_once 'functions.php';
 
 require_login();
 
-if (session_user_type() !== 'admin') {
+if (strtolower(trim(session_user_type())) !== 'admin') {
     header("Location: index.php");
     exit();
 }
+
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $conn = connect_db();
 
@@ -30,18 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['distribute_id'])) {
                 SELECT
                     br.id,
                     br.book_id,
+                    br.borrower_id,
                     br.quantity,
                     br.status,
+                    b.title,
                     b.quantity AS stock
                 FROM book_requests br
                 INNER JOIN books b ON b.id = br.book_id
                 WHERE br.id = ?
                 FOR UPDATE
             ");
-
-            if (!$stmt) {
-                throw new Exception("Unable to check the request.");
-            }
 
             $stmt->bind_param("i", $requestId);
             $stmt->execute();
@@ -59,6 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['distribute_id'])) {
             $quantity = (int) $request['quantity'];
             $stock = (int) $request['stock'];
             $bookId = (int) $request['book_id'];
+            $recipientId = (int) $request['borrower_id'];
+            $bookTitle = $request['title'];
 
             if ($quantity <= 0) {
                 throw new Exception("The requested quantity is invalid.");
@@ -73,10 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['distribute_id'])) {
                 SET quantity = quantity - ?
                 WHERE id = ? AND quantity >= ?
             ");
-
-            if (!$stmt) {
-                throw new Exception("Unable to update the book inventory.");
-            }
 
             $stmt->bind_param("iii", $quantity, $bookId, $quantity);
             $stmt->execute();
@@ -93,10 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['distribute_id'])) {
                 WHERE id = ? AND status = 'Approved'
             ");
 
-            if (!$stmt) {
-                throw new Exception("Unable to update the request status.");
-            }
-
             $stmt->bind_param("i", $requestId);
             $stmt->execute();
             $updated = $stmt->affected_rows;
@@ -106,8 +100,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['distribute_id'])) {
                 throw new Exception("The request status could not be updated.");
             }
 
+            $stmt = $conn->prepare("
+                INSERT INTO distributions
+                    (request_id, book_id, recipient_id, quantity)
+                VALUES (?, ?, ?, ?)
+            ");
+
+            $stmt->bind_param(
+                "iiii",
+                $requestId,
+                $bookId,
+                $recipientId,
+                $quantity
+            );
+
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("
+                INSERT INTO reports
+                    (
+                        borrower_id,
+                        book_title,
+                        borrow_date,
+                        due_date,
+                        return_date,
+                        status,
+                        penalty
+                    )
+                VALUES
+                    (
+                        ?,
+                        ?,
+                        CURDATE(),
+                        DATE_ADD(CURDATE(), INTERVAL 7 DAY),
+                        NULL,
+                        'Borrowed',
+                        'None'
+                    )
+            ");
+
+            $stmt->bind_param("is", $recipientId, $bookTitle);
+            $stmt->execute();
+            $stmt->close();
+
             $conn->commit();
-            $message = "Distribution completed. Inventory and request status were updated.";
+
+            $message = "Book distributed successfully. Distribution history and borrowing report have been saved.";
 
         } catch (Throwable $e) {
             try {
@@ -144,39 +183,31 @@ $sql = "
 
 $result = $conn->query($sql);
 
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $approvedRequests[] = $row;
-    }
-} else {
-    $error = $error ?: "Unable to load approved requests. Check your database table structure.";
+while ($row = $result->fetch_assoc()) {
+    $approvedRequests[] = $row;
 }
 
 $sql = "
     SELECT
-        br.id AS request_id,
-        br.quantity,
-        br.requested_at,
+        d.id AS distribution_id,
+        d.request_id,
+        d.quantity,
+        d.distributed_at,
         b.title,
         b.author,
         b.category,
         borrower.full_name,
         borrower.email
-    FROM book_requests br
-    INNER JOIN books b ON b.id = br.book_id
-    INNER JOIN borrowers borrower ON borrower.id = br.borrower_id
-    WHERE br.status = 'Completed'
-    ORDER BY br.requested_at DESC, br.id DESC
+    FROM distributions d
+    INNER JOIN books b ON b.id = d.book_id
+    INNER JOIN borrowers borrower ON borrower.id = d.recipient_id
+    ORDER BY d.distributed_at DESC, d.id DESC
 ";
 
 $result = $conn->query($sql);
 
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $completedDistributions[] = $row;
-    }
-} else {
-    $error = $error ?: "Unable to load completed distributions. Check your database table structure.";
+while ($row = $result->fetch_assoc()) {
+    $completedDistributions[] = $row;
 }
 
 $conn->close();
@@ -466,7 +497,6 @@ foreach ($completedDistributions as $item) {
                                             name="distribute_id"
                                             value="<?= (int) $item['request_id'] ?>"
                                         >
-
                                         <button class="distribute-button" type="submit">
                                             Mark as Distributed
                                         </button>
@@ -495,7 +525,7 @@ foreach ($completedDistributions as $item) {
                     <th>Category</th>
                     <th>Quantity Distributed</th>
                     <th>Status</th>
-                    <th>Request Date</th>
+                    <th>Distribution Date</th>
                 </tr>
                 </thead>
 
@@ -522,7 +552,7 @@ foreach ($completedDistributions as $item) {
                             <td><?= htmlspecialchars($item['category'] ?? '') ?></td>
                             <td><?= (int) $item['quantity'] ?></td>
                             <td><span class="status completed">Completed</span></td>
-                            <td><?= htmlspecialchars($item['requested_at']) ?></td>
+                            <td><?= htmlspecialchars($item['distributed_at']) ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -534,3 +564,4 @@ foreach ($completedDistributions as $item) {
 </div>
 </body>
 </html>
+```
