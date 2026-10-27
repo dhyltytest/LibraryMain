@@ -11,10 +11,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@electron/packager": "^20.3.0",
-    "electron": "^43.4.0"
+    "@electron/packager": "^20.3.0"
   },
   "devDependencies": {
+    "electron": "^45.0.0",
     "electron-packager": "^17.1.2"
   }
 }
