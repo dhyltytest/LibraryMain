@@ -1,4 +1,4 @@
-
+```php
 <?php
 session_start();
 
@@ -81,6 +81,7 @@ if ($stmt) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard - BookBridge</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -98,60 +99,52 @@ if ($stmt) {
             min-height: 100vh;
         }
 
-        
-.sidebar {
-    width: 245px;
-    flex-shrink: 0;
-    padding: 22px 14px;
-    background: #151922;
-    color: white;
-}
+        .sidebar {
+            width: 245px;
+            flex-shrink: 0;
+            padding: 22px 14px;
+            background: #151922;
+            color: white;
+        }
 
-.brand {
-    padding: 0 12px 0;
-    margin: 0 0 8px;
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
-}
+        .brand {
+            padding: 0 12px;
+            margin: 0 0 8px;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-.subtitle {
-    margin: 5px 12px 25px;
-    color: #8f98a8;
-    font-size: 11px;
-}
+        .subtitle {
+            margin: 5px 12px 25px;
+            color: #8f98a8;
+            font-size: 11px;
+        }
 
-.menu-heading {
-    margin: 10px 0;
-    padding: 10px 12px;
-    color: #727b8c;
-    font-size: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+        .menu-heading {
+            margin: 10px 0;
+            padding: 10px 12px;
+            color: #aab2c0;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-.nav-link {
-    display: block;
-    margin: 3px 0;
-    padding: 11px 12px;
-    border-radius: 7px;
-    color: #cbd0d8;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.nav-link:hover,
-.nav-link.active {
-    background: #252b38;
-    color: white;
-}
-
+        .nav-link {
+            display: block;
+            margin: 3px 0;
+            padding: 11px 12px;
+            border-radius: 7px;
+            color: #cbd0d8;
+            text-decoration: none;
+            font-size: 14px;
+        }
 
         .nav-link:hover,
         .nav-link.active {
-            background: #eff6ff;
-            color: #2563eb;
+            background: #252b38;
+            color: white;
         }
 
         .main {
@@ -239,7 +232,7 @@ if ($stmt) {
             padding: 21px;
             border: 1px solid #e5e7eb;
             border-radius: 10px;
-            background: #fff;
+            background: white;
         }
 
         .stat-label {
@@ -366,6 +359,7 @@ if ($stmt) {
         }
     </style>
 </head>
+
 <body>
 <div class="layout">
 
@@ -382,6 +376,7 @@ if ($stmt) {
         <div class="menu-heading">My Activity</div>
         <a class="nav-link" href="my_donations.php">♧ My Donations</a>
         <a class="nav-link" href="book_requests.php">□ My Requests</a>
+        <a class="nav-link" href="return_book.php">↩ Return Books</a>
         <a class="nav-link" href="distribution_history.php">↔ Distribution History</a>
 
         <div class="menu-heading">Account</div>
@@ -399,6 +394,7 @@ if ($stmt) {
                 <div class="avatar">
                     <?= htmlspecialchars($initial, ENT_QUOTES, 'UTF-8') ?>
                 </div>
+
                 <div>
                     <div class="user-name">
                         <?= htmlspecialchars($clientName, ENT_QUOTES, 'UTF-8') ?>
@@ -480,6 +476,13 @@ if ($stmt) {
                     </div>
                 </a>
 
+                <a class="action-card" href="return_book.php">
+                    <div class="action-title">Return Books</div>
+                    <div class="action-description">
+                        View your borrowed books and their return status.
+                    </div>
+                </a>
+
                 <a class="action-card" href="distribution_history.php">
                     <div class="action-title">Distribution History</div>
                     <div class="action-description">
@@ -510,3 +513,4 @@ if ($stmt) {
 </div>
 </body>
 </html>
+```

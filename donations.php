@@ -1,4 +1,4 @@
-
+```php
 <?php
 session_start();
 require_once __DIR__ . '/db.php';
@@ -257,6 +257,8 @@ h2{margin-top:0}
 label{display:block;font-weight:bold;margin:14px 0 6px}
 input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:7px;font-size:15px}
 button{border:0;border-radius:7px;padding:10px 13px;color:white;cursor:pointer}
+.submit-donation{background:#2563eb}
+.submit-donation:hover{background:#1d4ed8}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:850px}
 th,td{text-align:left;padding:12px;border-bottom:1px solid #e5e7eb;vertical-align:top}
@@ -393,7 +395,7 @@ th{background:#eff6ff}
         <input type="number" id="quantity" name="quantity" min="1" max="10000"
                value="<?= (int)$quantity ?>" required>
 
-        <button type="submit">Submit Donation</button>
+        <button class="submit-donation" type="submit">Submit Donation</button>
     </form>
     <?php endif; ?>
 </section>
@@ -435,3 +437,4 @@ th{background:#eff6ff}
 </main>
 </body>
 </html>
+```

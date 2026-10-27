@@ -1,14 +1,28 @@
+
 const { app, BrowserWindow } = require('electron');
 
 function createWindow() {
     const window = new BrowserWindow({
-        width: 800,
-        height: 600
+        width: 1200,
+        height: 800,
+        title: 'BookBridge'
     });
 
-window.loadURL('http://localhost/Library/');
+    window.loadURL('https://librarymain.gamer.gd/');
 }
 
 app.whenReady().then(() => {
     createWindow();
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        }
+    });
+});
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
